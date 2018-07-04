@@ -7,15 +7,6 @@ RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 
 RUN echo 'date.timezone = Asia/Shanghai' > /usr/local/etc/php/conf.d/timezone.ini
 
-# replace 163 mirrors
-RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak \
-    && ( \
-        echo 'deb http://mirrors.163.com/debian/ jessie main non-free contrib' >> /etc/apt/sources.list \
-        && echo 'deb http://mirrors.163.com/debian/ jessie-updates main non-free contrib' >> /etc/apt/sources.list \
-        && echo 'deb http://mirrors.163.com/debian/ jessie-backports main non-free contrib' >> /etc/apt/sources.list \
-        && echo 'deb http://mirrors.163.com/debian-security/ jessie/updates main non-free contrib' >> /etc/apt/sources.list \
-    )
-
 RUN apt-get update \
     # && apt-get upgrade -y \
     && apt-get install -y \
@@ -30,6 +21,7 @@ RUN apt-get update \
         libpng-dev \
         libnghttp2-dev \
         libxml2-dev \
+        libyaml-dev \
     && apt-get clean \
     && apt-get autoremove
 
@@ -43,8 +35,14 @@ RUN pecl install redis \
     && pecl install xdebug \
     && pecl install mongodb \
     && pecl install seaslog \
-    && docker-php-ext-enable redis xdebug mongodb seaslog \
+    && pecl install yaml \
+    && docker-php-ext-enable redis xdebug mongodb seaslog yaml \
     && pecl clear-cache
+
+# configuration for yaml
+RUN echo 'yaml.decode_timestamp=1' >> /usr/local/etc/php/conf.d/docker-php-ext-yaml.ini \
+    && echo 'yaml.decode_binary=0' >> /usr/local/etc/php/conf.d/docker-php-ext-yaml.ini \
+    && echo 'yaml.decode_php=0' >> /usr/local/etc/php/conf.d/docker-php-ext-yaml.ini
 
 # configuration for xdebug
 RUN echo 'xdebug.remote_enable = 1                           ;设置 HTTP 参数 XDEBUG_SESSION_START 开启调试' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
@@ -83,7 +81,7 @@ RUN wget https://github.com/redis/hiredis/archive/v0.13.3.tar.gz -O hiredis.tar.
     && rm -r hiredis
 
 # swoole
-RUN wget https://github.com/swoole/swoole-src/archive/v2.1.3.tar.gz -O swoole.tar.gz \
+RUN wget https://github.com/swoole/swoole-src/archive/v4.0.1.tar.gz -O swoole.tar.gz \
     && mkdir -p swoole \
     && tar -xf swoole.tar.gz -C swoole --strip-components=1 \
     && rm swoole.tar.gz \

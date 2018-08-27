@@ -1,6 +1,10 @@
 FROM php:7.1-fpm
 
-LABEL maintainer FangYutao <fangyutao1993@hotmail.com>
+MAINTAINER HappyStraw <fangyutao1993@hotmail.com>
+
+# version
+ENV HIREDIS_VERSION 0.13.3
+ENV SWOOLE_VERSION 4.0.4
 
 RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo 'Asia/Shanghai' > /etc/timezone
@@ -8,8 +12,11 @@ RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 RUN echo 'date.timezone = Asia/Shanghai' > /usr/local/etc/php/conf.d/timezone.ini
 
 RUN apt-get update \
-    # && apt-get upgrade -y \
     && apt-get install -y \
+        git \
+        procps \
+        less\
+        vim \
         curl \
         wget \
         zip \
@@ -56,6 +63,9 @@ RUN echo 'xdebug.remote_enable = 1                           ;设置 HTTP 参数
     && echo 'xdebug.profiler_output_dir = /tmp' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo 'xdebug.profiler_output_name = trace.%H.%R.%p' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
+# disable xdebug for default
+RUN mv /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.disabled
+
 # configuration for gateway
 RUN  echo 'seaslog.default_basepath = /home/www/log/gateway  ;默认log根目录' >> /usr/local/etc/php/conf.d/docker-php-ext-seaslog.ini \
     && echo 'seaslog.default_logger = default                  ;默认logger目录' >> /usr/local/etc/php/conf.d/docker-php-ext-seaslog.ini \
@@ -68,7 +78,7 @@ RUN  echo 'seaslog.default_basepath = /home/www/log/gateway  ;默认log根目录
     && echo "seaslog.default_template = '{\"request_time\":\"%T\",\"request_id\":\"%Q\",\"project\":\"gateway\",\"model\":\"gateway_inner\",\"more_info\":{\"level\":\"%L\",\"proccessid\":\"%P\",filename\":\"%F\",\"method\":\"%m\",\"hostname\":\"%H\"},\"client_ip\":\"%I\",%M}'" >> /usr/local/etc/php/conf.d/docker-php-ext-seaslog.ini
 
 # hiredis
-RUN wget https://github.com/redis/hiredis/archive/v0.13.3.tar.gz -O hiredis.tar.gz \
+RUN wget https://github.com/redis/hiredis/archive/v${HIREDIS_VERSION}.tar.gz -O hiredis.tar.gz \
     && mkdir -p hiredis \
     && tar -xf hiredis.tar.gz -C hiredis --strip-components=1 \
     && rm hiredis.tar.gz \
@@ -81,7 +91,7 @@ RUN wget https://github.com/redis/hiredis/archive/v0.13.3.tar.gz -O hiredis.tar.
     && rm -r hiredis
 
 # swoole
-RUN wget https://github.com/swoole/swoole-src/archive/v4.0.1.tar.gz -O swoole.tar.gz \
+RUN wget https://github.com/swoole/swoole-src/archive/v${SWOOLE_VERSION}.tar.gz -O swoole.tar.gz \
     && mkdir -p swoole \
     && tar -xf swoole.tar.gz -C swoole --strip-components=1 \
     && rm swoole.tar.gz \
@@ -99,7 +109,7 @@ RUN wget https://github.com/swoole/swoole-src/archive/v4.0.1.tar.gz -O swoole.ta
 RUN curl -sS https://getcomposer.org/installer | php \
     && mv composer.phar /usr/local/bin/composer \
     && composer self-update --clean-backups \
-    && composer config -g repo.packagist composer https://packagist.phpcomposer.com
+    && composer config -g repo.packagist composer https://packagist.laravel-china.org
 
 VOLUME /var/www/kmweb
 

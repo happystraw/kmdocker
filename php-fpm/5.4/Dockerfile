@@ -1,6 +1,6 @@
 FROM php:5.4-fpm
 
-LABEL maintainer FangYutao <fangyutao1993@hotmail.com>
+MAINTAINER HappyStraw <fangyutao1993@hotmail.com>
 
 RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo 'Asia/Shanghai' > /etc/timezone
@@ -8,8 +8,11 @@ RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
 RUN echo 'date.timezone = Asia/Shanghai' > /usr/local/etc/php/conf.d/timezone.ini
 
 RUN apt-get update \
-    # && apt-get upgrade -y \
     && apt-get install -y \
+        git \
+        procps \
+        less\
+        vim \
         curl \
         wget \
         zip \

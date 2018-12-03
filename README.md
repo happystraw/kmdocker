@@ -14,6 +14,11 @@ docker run --name kmphpfpm71 -d -p 9071:9000 --add-host locdev:your_ip -v path/t
 
 # php 5.4
 docker run --name kmphpfpm54 -d -p 9054:9000 --add-host locdev:your_ip -v path/to/project:/var/www/kmweb happystraw/kmphpfpm:5.4
+
+# swoole
+# 说明:
+# - php /var/www/kmweb/start.php 启动命令
+docker run --name kmswoole -d -p 5200:5200 -v path/to/project:/var/www/kmweb happystraw/kmswoole php /var/www/kmweb/start.php
 ```
 
 ### Install from source

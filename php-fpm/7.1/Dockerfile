@@ -2,10 +2,6 @@ FROM php:7.1-fpm
 
 MAINTAINER HappyStraw <fangyutao1993@hotmail.com>
 
-# version
-ENV HIREDIS_VERSION 0.13.3
-ENV SWOOLE_VERSION 4.0.4
-
 RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo 'Asia/Shanghai' > /etc/timezone
 
@@ -63,9 +59,6 @@ RUN echo 'xdebug.remote_enable = 1                           ;设置 HTTP 参数
     && echo 'xdebug.profiler_output_dir = /tmp' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && echo 'xdebug.profiler_output_name = trace.%H.%R.%p' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
-# disable xdebug for default
-RUN mv /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini.disabled
-
 # configuration for gateway
 RUN  echo 'seaslog.default_basepath = /home/www/log/gateway  ;默认log根目录' >> /usr/local/etc/php/conf.d/docker-php-ext-seaslog.ini \
     && echo 'seaslog.default_logger = default                  ;默认logger目录' >> /usr/local/etc/php/conf.d/docker-php-ext-seaslog.ini \
@@ -76,34 +69,6 @@ RUN  echo 'seaslog.default_basepath = /home/www/log/gateway  ;默认log根目录
     && echo 'seaslog.buffer_size = 0                           ;buffer中缓冲数量, 默认0(不使用buffer_size)' >> /usr/local/etc/php/conf.d/docker-php-ext-seaslog.ini \
     && echo 'seaslog.level = 8                                 ;记录日志级别 默认0(所有日志)' >> /usr/local/etc/php/conf.d/docker-php-ext-seaslog.ini \
     && echo "seaslog.default_template = '{\"request_time\":\"%T\",\"request_id\":\"%Q\",\"project\":\"gateway\",\"model\":\"gateway_inner\",\"more_info\":{\"level\":\"%L\",\"proccessid\":\"%P\",filename\":\"%F\",\"method\":\"%m\",\"hostname\":\"%H\"},\"client_ip\":\"%I\",%M}'" >> /usr/local/etc/php/conf.d/docker-php-ext-seaslog.ini
-
-# hiredis
-RUN wget https://github.com/redis/hiredis/archive/v${HIREDIS_VERSION}.tar.gz -O hiredis.tar.gz \
-    && mkdir -p hiredis \
-    && tar -xf hiredis.tar.gz -C hiredis --strip-components=1 \
-    && rm hiredis.tar.gz \
-    && ( \
-        cd hiredis \
-        && make -j$(nproc) \
-        && make install \
-        && ldconfig \
-    ) \
-    && rm -r hiredis
-
-# swoole
-RUN wget https://github.com/swoole/swoole-src/archive/v${SWOOLE_VERSION}.tar.gz -O swoole.tar.gz \
-    && mkdir -p swoole \
-    && tar -xf swoole.tar.gz -C swoole --strip-components=1 \
-    && rm swoole.tar.gz \
-    && ( \
-        cd swoole \
-        && phpize \
-        && ./configure --enable-async-redis --enable-mysqlnd --enable-coroutine --enable-openssl --enable-http2 \
-        && make -j$(nproc) \
-        && make install \
-    ) \
-    && rm -r swoole \
-    && docker-php-ext-enable swoole
 
 # composer & cdn for china
 RUN curl -sS https://getcomposer.org/installer | php \

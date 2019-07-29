@@ -1,0 +1,63 @@
+version: "3"
+
+services:
+
+  phpfpm5.4:
+    container_name: kmphpfpm5.4
+    image: happystraw/kmphpfpm:5.4
+    restart: always
+    networks:
+      - kmnetwork
+    volumes:
+      - "$PROJECTS_PATH:/var/www/kmweb"
+      - "$LOGS_PATH:/home/www/log/"
+    extra_hosts:
+      - "locdev:$LOCDEV"
+
+  phpfpm7.1:
+    container_name: kmphpfpm7.1
+    image: happystraw/kmphpfpm:7.1
+    restart: always
+    networks:
+      - kmnetwork
+    volumes:
+      - "$PROJECTS_PATH:/var/www/kmweb"
+      - "$LOGS_PATH:/home/www/log/"
+    extra_hosts:
+      - "locdev:$LOCDEV"
+
+  nginx:
+    container_name: kmnginx
+    image: nginx:latest
+    restart: always
+    depends_on:
+      - phpfpm5.4
+      - phpfpm7.1
+    networks:
+      - kmnetwork
+    volumes:
+      - "$VHOSTS_PATH:/etc/nginx/conf.d"
+      - "$PROJECTS_PATH:/var/www/kmweb"
+    ports:
+      - "9901:9901"
+      - "9902:9902"
+      - "9903:9903"
+      - "9905:9905"
+      - "9906:9906"
+      - "10023:10023"
+    extra_hosts:
+      - "locdev:$LOCDEV"
+
+  # redis:
+  #   container_name: kmredis
+  #   image: redis:latest
+  #   networks:
+  #     - kmnetwork
+  #   ports:
+  #     - "16379:6379"
+  #   extra_hosts:
+  #     - "locdev:$LOCDEV"
+
+networks:
+  kmnetwork:
+    driver: bridge

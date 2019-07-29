@@ -1,0 +1,31 @@
+server {
+    listen 8080;
+    #listen [::]:80 default_server ipv6only=on;
+    server_name localhost:8080;
+    index index.html index.htm index.php;
+    root  /var/www/kmweb/project_path/;
+    #error_log /tmp/nginx_rainbow_error.log;
+    #access_log /tmp/nginx_rainbow_access.log;
+
+    #error_page   404   /404.html;
+
+    location ~* ^.+\.(js|ico|gif|jpg|png|css|htm|shtml|swf|bmp|txt)$ {
+            expires 1h;
+    }
+
+    if ($http_range) {
+            return 403;
+            break;
+    }
+    location / {
+            try_files $uri $uri/ /index.php$request_uri;
+    }
+
+    location ~ .php
+    {
+        fastcgi_pass kmphpfpm7.1:9000;
+        fastcgi_index index.php;
+        include        fastcgi_params;
+        fastcgi_param  SCRIPT_FILENAME  /var/www/kmweb/project_path/$fastcgi_script_name;
+    }
+}

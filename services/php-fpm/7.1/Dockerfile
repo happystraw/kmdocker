@@ -1,6 +1,6 @@
 FROM php:7.1-fpm
 
-MAINTAINER HappyStraw <fangyutao1993@hotmail.com>
+LABEL HappyStraw <fangyutao1993@hotmail.com>
 
 RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && echo 'Asia/Shanghai' > /etc/timezone

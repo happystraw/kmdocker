@@ -1,0 +1,48 @@
+server {
+        listen 8080;
+        #listen [::]:80 default_server ipv6only=on;
+        server_name localhost:8080;
+        index index.html index.htm index.php;
+        root  /var/www/kmweb/project_path;
+        #error_log /tmp/nginx_htgl_error.log;
+        #access_log /tmp/nginx_htgl_access.log;
+
+        #error_page   404   /404.html;
+
+        #location ~* ^.+\.(js|ico|gif|jpg|png|css|htm|shtml|swf|bmp|txt)$ {
+        #        expires      1h;
+        #}
+
+        if ($http_range) {
+                return 403;
+                break;
+        }
+        client_max_body_size 20M;
+        location / {
+            if (!-e $request_filename)
+            {
+                rewrite ^/(.*)$ /index.php/$1 last;
+                rewrite ^/(.*)$ /index.php?s=/$1 last;
+                break;
+                #rewrite ^/([a-zA-Z]+)/([\w]+)/(.*)$ index.php?cmd=$1&action=$2 last;
+                #rewrite ^index\.php$ index.php?cmd=login&action=doload last;
+            }
+        }
+
+        location ~ .+\.php($|/) {
+            set $script     $uri;
+            set $path_info  "/";
+            if ($uri ~ "^(.+\.php)(/.+)"){
+                set $script     $1;
+                set $path_info  $2;
+            }
+            fastcgi_pass   kmphpfpm5.4:9000;
+            fastcgi_index  index.php?IF_REWRITE=1;
+            #client_max_body_size 20M;
+            fastcgi_param  SCRIPT_FILENAME  /var/www/kmweb/project_path/$script;
+            include        fastcgi_params;
+            fastcgi_param   PATH_INFO   $path_info;
+            fastcgi_param   SCRIPT_NAME $script;
+            fastcgi_read_timeout 600;
+        }
+}

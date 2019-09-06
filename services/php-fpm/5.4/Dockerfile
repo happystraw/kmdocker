@@ -32,7 +32,7 @@ RUN docker-php-ext-install mcrypt pdo_mysql zip bcmath mysqli mbstring soap mysq
     && docker-php-ext-install gd
 
 # redis xdebug
-RUN pecl install redis \
+RUN pecl install redis-3.1.4 \
     && pecl install xdebug-2.4.1 \
     && docker-php-ext-enable redis xdebug \
     && pecl clear-cache

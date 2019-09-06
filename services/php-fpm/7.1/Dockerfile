@@ -39,13 +39,17 @@ RUN pecl install redis \
     && pecl install mongodb \
     && pecl install seaslog \
     && pecl install yaml \
-    && docker-php-ext-enable redis xdebug mongodb seaslog yaml \
+    && pecl install channel://pecl.php.net/yac-2.0.2 \
+    && docker-php-ext-enable redis xdebug mongodb seaslog yaml yac \
     && pecl clear-cache
 
 # configuration for yaml
 RUN echo 'yaml.decode_timestamp=1' >> /usr/local/etc/php/conf.d/docker-php-ext-yaml.ini \
     && echo 'yaml.decode_binary=0' >> /usr/local/etc/php/conf.d/docker-php-ext-yaml.ini \
     && echo 'yaml.decode_php=0' >> /usr/local/etc/php/conf.d/docker-php-ext-yaml.ini
+
+# configuration for yac
+RUN echo 'yac.enable_cli = 1' >> /usr/local/etc/php/conf.d/docker-php-ext-yac.ini
 
 # configuration for xdebug
 RUN echo 'xdebug.remote_enable = 1                           ;设置 HTTP 参数 XDEBUG_SESSION_START 开启调试' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
@@ -74,7 +78,7 @@ RUN  echo 'seaslog.default_basepath = /home/www/log/gateway  ;默认log根目录
 RUN curl -sS https://getcomposer.org/installer | php \
     && mv composer.phar /usr/local/bin/composer \
     && composer self-update --clean-backups \
-    && composer config -g repo.packagist composer https://packagist.laravel-china.org
+    && composer config -g repo.packagist composer https://mirrors.aliyun.com/composer/
 
 VOLUME /var/www/kmweb
 

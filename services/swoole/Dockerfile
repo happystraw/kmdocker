@@ -1,12 +1,12 @@
 FROM php:7.1
 
-LABEL HappyStraw <fangyutao1993@hotmail.com>
+LABEL maintainer="HappyStraw <fangyutao1993@hotmail.com>"
 
 # version
 ENV SWOOLE_VERSION 4.2.10
 
-RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo 'Asia/Shanghai' > /etc/timezone
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata
 
 RUN echo 'date.timezone = Asia/Shanghai' > /usr/local/etc/php/conf.d/timezone.ini
 
@@ -49,7 +49,7 @@ RUN docker-php-ext-install mcrypt
 RUN pecl install redis && docker-php-ext-enable redis && pecl clear-cache
 
 # Swoole extension
-Run wget https://pecl.php.net/get/swoole-${SWOOLE_VERSION}.tgz -O swoole.tgz \
+RUN wget https://pecl.php.net/get/swoole-${SWOOLE_VERSION}.tgz -O swoole.tgz \
     && mkdir -p swoole-src \
     && tar -zxvf swoole.tgz -C swoole-src \
     && rm swoole.tgz \

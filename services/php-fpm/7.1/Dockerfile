@@ -1,9 +1,9 @@
 FROM php:7.1-fpm
 
-LABEL HappyStraw <fangyutao1993@hotmail.com>
+LABEL maintainer="HappyStraw <fangyutao1993@hotmail.com>"
 
-RUN /bin/cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-    && echo 'Asia/Shanghai' > /etc/timezone
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata
 
 RUN echo 'date.timezone = Asia/Shanghai' > /usr/local/etc/php/conf.d/timezone.ini
 
@@ -26,7 +26,8 @@ RUN apt-get update \
         libxml2-dev \
         libyaml-dev \
     && apt-get clean \
-    && apt-get autoremove
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 # mcrypt pdo_mysql zip bcmath mbstring gd mysqli soap
 RUN docker-php-ext-install mcrypt pdo_mysql zip bcmath mbstring mysqli soap \

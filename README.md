@@ -21,14 +21,14 @@
 
     也可以不通过改`.env`文件, 直接与命令一起执行, 如
 
-      ```bash
+    ```bash
     VHOSTS_PATH=/home/happystraw/Projects/vhosts docker-composer up
-      ```
+    ```
 
 3. `docker-compose` 配置
 
     ```yaml
-    # 修改 nginx vhost 配置中需要映射的端口
+    # 修改 nginx vhost 配置中需要映射的端口(主机:容器)
     ports:
       - "9901:9901"
       # ...

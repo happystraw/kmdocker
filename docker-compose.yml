@@ -26,6 +26,18 @@ services:
     extra_hosts:
       - "locdev:$LOCDEV"
 
+  phpfpm7.3:
+    container_name: kmphpfpm7.3
+    image: happystraw/kmphpfpm:7.3
+    restart: always
+    networks:
+      - kmnetwork
+    volumes:
+      - "$PROJECTS_PATH:/var/www/kmweb"
+      - "$LOGS_PATH:/home/www/log/"
+    extra_hosts:
+      - "locdev:$LOCDEV"
+
   nginx:
     container_name: kmnginx
     image: nginx:latest

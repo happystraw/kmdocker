@@ -1,10 +1,21 @@
 version: "3"
 
 services:
-
   phpfpm5.4:
     container_name: kmphpfpm5.4
     image: happystraw/kmphpfpm:5.4
+    restart: always
+    networks:
+      - kmnetwork
+    volumes:
+      - "$PROJECTS_PATH:/var/www/kmweb"
+      - "$LOGS_PATH:/home/www/log/"
+    extra_hosts:
+      - "locdev:$LOCDEV"
+
+  phpfpm5.6:
+    container_name: kmphpfpm5.6
+    image: happystraw/kmphpfpm:5.6
     restart: always
     networks:
       - kmnetwork
@@ -44,7 +55,9 @@ services:
     restart: always
     depends_on:
       - phpfpm5.4
+      - phpfpm5.6
       - phpfpm7.1
+      - phpfpm7.3
     networks:
       - kmnetwork
     volumes:
@@ -58,6 +71,7 @@ services:
       - "9906:9906"
       - "10023:10023"
       - "9907:9907"
+      - "9908:9908"
     extra_hosts:
       - "locdev:$LOCDEV"
 

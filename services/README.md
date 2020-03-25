@@ -15,6 +15,9 @@ docker run --name kmphpfpm73 -d -p 9073:9000 --add-host locdev:your_ip -v path/t
 # php 7.1
 docker run --name kmphpfpm71 -d -p 9071:9000 --add-host locdev:your_ip -v path/to/project:/var/www/kmweb happystraw/kmphpfpm:7.1
 
+# php 5.6
+docker run --name kmphpfpm56 -d -p 9054:9000 --add-host locdev:your_ip -v path/to/project:/var/www/kmweb happystraw/kmphpfpm:5.6
+
 # php 5.4
 docker run --name kmphpfpm54 -d -p 9054:9000 --add-host locdev:your_ip -v path/to/project:/var/www/kmweb happystraw/kmphpfpm:5.4
 
